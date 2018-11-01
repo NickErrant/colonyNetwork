@@ -559,11 +559,12 @@ class ReputationMiner {
     if (!entryIndex) {
       return new Error("No valid entry for submission found");
     }
-    //
+    // Get the JRH
+    const jrh = await this.justificationTree.getRootHash();
     // Submit that entry
-    const gas = await repCycle.estimate.submitRootHash(hash, this.nReputations, entryIndex);
+    const gas = await repCycle.estimate.submitRootHash(hash, this.nReputations, jrh, entryIndex);
 
-    return repCycle.submitRootHash(hash, this.nReputations, entryIndex, { gasLimit: `0x${gas.mul(2).toString()}` });
+    return repCycle.submitRootHash(hash, this.nReputations, jrh, entryIndex, { gasLimit: `0x${gas.toString(16)}` });
   }
 
   /**
@@ -647,8 +648,7 @@ class ReputationMiner {
    * Submit the Justification Root Hash (JRH) for the hash that (presumably) we submitted this round
    * @return {Promise}
    */
-  async submitJustificationRootHash() {
-    const jrh = await this.justificationTree.getRootHash();
+  async confirmJustificationRootHash() {
     const [branchMask1, siblings1] = await this.justificationTree.getProof(`0x${new BN("0").toString(16, 64)}`);
     const repCycle = await this.getActiveRepCycle();
     const nLogEntries = await repCycle.getReputationUpdateLogLength();
@@ -656,7 +656,7 @@ class ReputationMiner {
     const totalnUpdates = lastLogEntry[4].add(lastLogEntry[5]).add(this.nReputationsBeforeLatestLog);
     const [branchMask2, siblings2] = await this.justificationTree.getProof(ReputationMiner.getHexString(totalnUpdates, 64));
     const [round, index] = await this.getMySubmissionRoundAndIndex();
-    const res = await repCycle.submitJustificationRootHash(round, index, jrh, branchMask1, siblings1, branchMask2, siblings2, { gasLimit: 6000000 });
+    const res = await repCycle.confirmJustificationRootHash(round, index, branchMask1, siblings1, branchMask2, siblings2, { gasLimit: 6000000 });
     return res;
   }
 
