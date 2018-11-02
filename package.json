@@ -67,7 +67,7 @@
     "eth-ens-namehash": "^2.0.8",
     "eth-gas-reporter": "^0.1.2",
     "ethereumjs-util": "^6.0.0",
-    "ganache-cli": "https://github.com/area/ganache-cli.git#fakefix/eth_call_selfdestruct",
+    "ganache-cli": "^6.1.8",
     "husky": "^1.0.0-rc.13",
     "istanbul": "^0.4.5",
     "jsonfile": "^5.0.0",
